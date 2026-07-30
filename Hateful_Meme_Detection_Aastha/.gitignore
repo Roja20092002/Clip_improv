@@ -1,0 +1,15 @@
+venv/
+.env
+__pycache__/
+*.pyc
+*.pkl
+*.pt
+*.pth
+*.ckpt
+.ipynb_checkpoints/
+datasets/
+data/
+output.txt
+checkpoints/
+weights/
+saved_models/
