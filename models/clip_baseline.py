@@ -13,7 +13,7 @@ class CLIPBaseline(nn.Module):
         embedding_dim = self.encoder.embedding_dim
 
         self.classifier = nn.Sequential(
-            nn.Linear(embedding_dim * 2, 512),
+            nn.Linear(embedding_dim * 2, 512), # type: ignore
             nn.ReLU(),
             nn.Dropout(0.3),
             nn.Linear(512, num_classes),
