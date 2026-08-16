@@ -20,9 +20,12 @@ class MAMIDataset(Dataset):
         text = sample["text"]
 
         encoding = self.processor(
-            text=text,
-            images=image,
-            return_tensors="pt",
+        text=text,
+        images=image,
+        return_tensors="pt",
+        padding="max_length",
+        truncation=True,
+        max_length=77,
         )
 
         return {
