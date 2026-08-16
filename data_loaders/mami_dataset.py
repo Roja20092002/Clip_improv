@@ -5,7 +5,6 @@ from torch.utils.data import Dataset
 class MAMIDataset(Dataset):
 
     def __init__(self, hf_dataset, processor):
-
         self.dataset = hf_dataset
         self.processor = processor
 
@@ -20,20 +19,37 @@ class MAMIDataset(Dataset):
         text = sample["text"]
 
         encoding = self.processor(
-        text=text,
-        images=image,
-        return_tensors="pt",
-        padding="max_length",
-        truncation=True,
-        max_length=77,
+            text=text,
+            images=image,
+            return_tensors="pt",
+            padding="max_length",
+            truncation=True,
+            max_length=77,
+        )
+
+        # MAMI binary classification:
+        # 0 -> non-misogynous
+        # >0 -> misogynous
+
+        binary_label = (
+            0
+            if sample["multiclass_label"] == 0
+            else 1
         )
 
         return {
-            "input_ids": encoding["input_ids"].squeeze(0),
-            "attention_mask": encoding["attention_mask"].squeeze(0),
-            "pixel_values": encoding["pixel_values"].squeeze(0),
-            "label": torch.tensor(
-                sample["multiclass_label"],
-                dtype=torch.long
-            ),
+            "input_ids":
+                encoding["input_ids"].squeeze(0),
+
+            "attention_mask":
+                encoding["attention_mask"].squeeze(0),
+
+            "pixel_values":
+                encoding["pixel_values"].squeeze(0),
+
+            "label":
+                torch.tensor(
+                    binary_label,
+                    dtype=torch.long
+                ),
         }

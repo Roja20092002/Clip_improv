@@ -142,7 +142,10 @@ print(
 
 indices = list(range(len(full_dataset)))
 
-labels = full_dataset["multiclass_label"]
+labels = [
+    0 if label == 0 else 1
+    for label in full_dataset["multiclass_label"]
+]
 
 train_indices, val_indices = train_test_split(
     indices,
