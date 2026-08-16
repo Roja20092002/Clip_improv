@@ -15,7 +15,7 @@ from data_loaders.mami_dataset import MAMIDataset
 from utils.metrics import calculate_metrics
 from utils.seed import set_seed
 import configs.config as config
-
+from sklearn.model_selection import train_test_split
 
 # ============================================================
 # SETTINGS
@@ -140,14 +140,19 @@ print(
 # TRAIN / VALIDATION SPLIT
 # ============================================================
 
-split = full_dataset.train_test_split(
+indices = list(range(len(full_dataset)))
+
+labels = full_dataset["multiclass_label"]
+
+train_indices, val_indices = train_test_split(
+    indices,
     test_size=0.1,
-    seed=SEED,
-    stratify_by_column="multiclass_label"
+    random_state=SEED,
+    stratify=labels,
 )
 
-train_hf = split["train"]
-val_hf = split["test"]
+train_hf = full_dataset.select(train_indices)
+val_hf = full_dataset.select(val_indices)
 
 print("Training samples:", len(train_hf))
 print("Validation samples:", len(val_hf))
