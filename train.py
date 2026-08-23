@@ -32,7 +32,7 @@ SEED = config.SEED
 # Persistent Google Drive location
 CHECKPOINT_DIR = os.environ.get(
     "CLIP_CHECKPOINT_DIR",
-    "/content/drive/MyDrive/Clip_improv_experiments/mami_clip_baseline"
+    "/content/drive/MyDrive/Clip_improv_experiments/mami_clip_frozen_baseline"
 )
 
 os.makedirs(CHECKPOINT_DIR, exist_ok=True)
