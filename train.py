@@ -217,8 +217,15 @@ print("Validation batches:", len(val_loader))
 print("\nLoading CLIP model...")
 
 model = CLIPBaseline(
-    num_classes=config.NUM_CLASSES
+    num_classes=config.NUM_CLASSES,
+    freeze_clip=True,
 ).to(device)
+
+# Temporary sanity check: print parameter counts by trainability.
+total_params = sum(p.numel() for p in model.parameters())
+trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+frozen_params = total_params - trainable_params
+print(f"Model parameters — total: {total_params}, trainable: {trainable_params}, frozen: {frozen_params}")
 
 
 # ============================================================
