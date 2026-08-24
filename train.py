@@ -42,16 +42,6 @@ BEST_MODEL_PATH = os.path.join(
     "best_model.pth"
 )
 
-LAST_CHECKPOINT_PATH = os.path.join(
-    CHECKPOINT_DIR,
-    "last_checkpoint.pth"
-)
-
-FINAL_MODEL_PATH = os.path.join(
-    CHECKPOINT_DIR,
-    "final_model.pth"
-)
-
 HISTORY_PATH = os.path.join(
     CHECKPOINT_DIR,
     "history.json"
@@ -284,57 +274,12 @@ scaler = torch.amp.GradScaler(
 
 
 # ============================================================
-# RESUME
+# TRAINING STATE
 # ============================================================
 
 start_epoch = 0
 best_f1 = -1.0
 history = []
-
-if os.path.exists(LAST_CHECKPOINT_PATH):
-
-    print("\nExisting checkpoint found.")
-    print("Resuming training...")
-
-    checkpoint = torch.load(
-        LAST_CHECKPOINT_PATH,
-        map_location=device
-    )
-
-    model.load_state_dict(
-        checkpoint["model_state_dict"]
-    )
-
-    optimizer.load_state_dict(
-        checkpoint["optimizer_state_dict"]
-    )
-
-    scheduler.load_state_dict(
-        checkpoint["scheduler_state_dict"]
-    )
-
-    if checkpoint.get("scaler_state_dict") is not None:
-
-        scaler.load_state_dict(
-            checkpoint["scaler_state_dict"]
-        )
-
-    start_epoch = checkpoint["epoch"] + 1
-
-    best_f1 = checkpoint["best_f1"]
-
-    history = checkpoint.get(
-        "history",
-        []
-    )
-
-    print(
-        f"Resuming from epoch {start_epoch + 1}"
-    )
-
-    print(
-        f"Previous best F1: {best_f1:.4f}"
-    )
 
 
 # ============================================================
@@ -740,49 +685,6 @@ for epoch in range(
 
 
     # ========================================================
-    # SAVE FULL CHECKPOINT
-    # ========================================================
-
-    torch.save(
-        {
-            "epoch": epoch,
-
-            "model_state_dict":
-                model.state_dict(),
-
-            "optimizer_state_dict":
-                optimizer.state_dict(),
-
-            "scheduler_state_dict":
-                scheduler.state_dict(),
-
-            "scaler_state_dict":
-                scaler.state_dict()
-                if use_amp
-                else None,
-
-            "best_f1":
-                best_f1,
-
-            "history":
-                history,
-
-            "config":
-                experiment_config,
-        },
-        LAST_CHECKPOINT_PATH
-    )
-
-    print(
-        "✓ Checkpoint saved:"
-    )
-
-    print(
-        LAST_CHECKPOINT_PATH
-    )
-
-
-    # ========================================================
     # EARLY STOPPING
     # ========================================================
 
@@ -794,15 +696,6 @@ for epoch in range(
 
         break
 
-
-# ============================================================
-# FINAL MODEL
-# ============================================================
-
-torch.save(
-    model.state_dict(),
-    FINAL_MODEL_PATH
-)
 
 print("\n")
 print("=" * 60)
@@ -816,11 +709,6 @@ print(
 print(
     "Best model:",
     BEST_MODEL_PATH
-)
-
-print(
-    "Final model:",
-    FINAL_MODEL_PATH
 )
 
 print(
