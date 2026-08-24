@@ -32,7 +32,7 @@ SEED = config.SEED
 # Persistent Google Drive location
 CHECKPOINT_DIR = os.environ.get(
     "CLIP_CHECKPOINT_DIR",
-    "/content/drive/MyDrive/Clip_improv_experiments/mami_clip_l6_l12"
+    "/content/drive/MyDrive/Clip_improv_experiments/mami_clip_l11"
 )
 
 os.makedirs(CHECKPOINT_DIR, exist_ok=True)
@@ -216,9 +216,14 @@ print("Validation batches:", len(val_loader))
 
 print("\nLoading CLIP model...")
 
+# Allow selecting how many final CLIP encoder layers to unfreeze via
+# the CLIP_UNFREEZE_LAYERS environment variable (0-3). Defaults to 1
+# to preserve previous behavior when the env var is not set.
+unfreeze_layers = int(os.environ.get("CLIP_UNFREEZE_LAYERS", "1"))
+
 model = CLIPBaseline(
     num_classes=config.NUM_CLASSES,
-    freeze_clip=True,
+    unfreeze_layers=unfreeze_layers,
 ).to(device)
 
 # Temporary sanity check: print parameter counts by trainability.
@@ -226,6 +231,13 @@ total_params = sum(p.numel() for p in model.parameters())
 trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 frozen_params = total_params - trainable_params
 print(f"Model parameters — total: {total_params}, trainable: {trainable_params}, frozen: {frozen_params}")
+
+# Persist model parameter counts into the saved config so experiment runners can
+# later read trainable parameter counts without parsing logs.
+experiment_config["total_params"] = int(total_params)
+experiment_config["trainable_params"] = int(trainable_params)
+with open(CONFIG_PATH, "w") as f:
+    json.dump(experiment_config, f, indent=4)
 
 
 # ============================================================

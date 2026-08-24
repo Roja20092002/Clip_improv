@@ -5,11 +5,13 @@ from models.clip_encoder import CLIPEncoder
 
 
 class CLIPBaseline(nn.Module):
-    def __init__(self, num_classes=2, freeze_clip: bool = False):
+    def __init__(self, num_classes=2, freeze_clip: bool = False, unfreeze_layers: int = 0):
         super().__init__()
 
-        # Pass freeze_clip to the encoder; default False preserves existing behavior.
-        self.encoder = CLIPEncoder(freeze_clip=freeze_clip)
+        self.encoder = CLIPEncoder(
+            freeze_clip=freeze_clip,
+            unfreeze_layers=unfreeze_layers,
+        )
 
         embedding_dim = self.encoder.embedding_dim
 
